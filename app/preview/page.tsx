@@ -1,0 +1,250 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
+import { ArrowLeft, Edit, Send, Save, Clock } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { format } from "date-fns"
+
+interface NewsletterSection {
+  id: string
+  title: string
+  content: string
+}
+
+export default function NewsletterPreview() {
+  const router = useRouter()
+  const [subject, setSubject] = useState("")
+  const [sections, setSections] = useState<NewsletterSection[]>([])
+  const [template, setTemplate] = useState("header-content-footer")
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isClient) return
+
+    const previewData = localStorage.getItem("newsletter-preview")
+    if (previewData) {
+      const data = JSON.parse(previewData)
+      setSubject(data.subject || "")
+      setSections(data.sections || [])
+      setTemplate(data.template || "header-content-footer")
+    }
+  }, [isClient])
+
+  const handleBack = () => {
+    router.push("/")
+  }
+
+  const handleEdit = () => {
+    router.push("/")
+  }
+
+  const handleSend = () => {
+    alert("Newsletter sent successfully!")
+    router.push("/")
+  }
+
+  const handleSaveDraft = () => {
+    if (!isClient) return
+
+    const newsletter = {
+      id: Date.now().toString(),
+      subject,
+      sections,
+      template,
+      status: "draft",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+
+    const saved = localStorage.getItem("newsletters")
+    const newsletters = saved ? JSON.parse(saved) : []
+    newsletters.push(newsletter)
+    localStorage.setItem("newsletters", JSON.stringify(newsletters))
+
+    alert("Newsletter saved as draft!")
+  }
+
+  const handleSchedule = () => {
+    alert("Schedule functionality would open here")
+  }
+
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="border-b bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center space-x-4">
+                <h1 className="text-xl font-semibold">Spaces</h1>
+                <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
+                  <span className="ml-4">Newsletter Preview</span>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </header>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/3 mb-8"></div>
+            <div className="bg-white border rounded-lg p-8">
+              <div className="h-6 bg-gray-200 rounded w-1/2 mb-6"></div>
+              <div className="space-y-4">
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="border-b bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-4">
+              <h1 className="text-xl font-semibold">Spaces</h1>
+              <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
+                <Button variant="ghost" onClick={handleBack} className="flex items-center gap-1 p-0 h-auto">
+                  <ArrowLeft className="h-4 w-4" />
+                  Back
+                </Button>
+                <span className="ml-4">Newsletter Preview</span>
+              </nav>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Badge variant="secondary">Blog</Badge>
+              <Badge variant="secondary">Templates</Badge>
+              <Badge variant="secondary">Contact</Badge>
+              <div className="w-8 h-8 rounded-full bg-gray-300"></div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+          <h1 className="text-3xl font-bold text-balance">Newsletter Preview</h1>
+          <div className="flex items-center space-x-3 mt-4 sm:mt-0">
+            <Button variant="outline" onClick={handleEdit}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
+            <Button onClick={handleSend} className="bg-black text-white hover:bg-gray-800">
+              <Send className="h-4 w-4 mr-2" />
+              Send
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Newsletter Preview - Main Content */}
+          <div className="lg:col-span-3">
+            <div className="bg-white border rounded-lg p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <h1 className="text-xl font-bold">Subject: {subject || "Untitled Newsletter"}</h1>
+                <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 text-xs">
+                  Draft
+                </Badge>
+              </div>
+
+              <div className="space-y-6">
+                {/* Newsletter Title */}
+                <h2 className="text-2xl font-bold">{subject || "Huge Summer Sale!"}</h2>
+
+                {/* Newsletter Content */}
+                {sections.length > 0 && sections.some((s) => s.content.trim()) ? (
+                  sections.map(
+                    (section) =>
+                      section.content.trim() && (
+                        <div key={section.id} className="prose max-w-none">
+                          <div dangerouslySetInnerHTML={{ __html: section.content }} />
+                        </div>
+                      ),
+                  )
+                ) : (
+                  <div className="space-y-4">
+                    <p className="text-gray-700 leading-relaxed">
+                      Don't miss out on our biggest sale of the year. Get up to 50% off on selected items. Lorem ipsum
+                      dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore
+                      magna aliqua.
+                    </p>
+                    <Button className="bg-black text-white hover:bg-gray-800 px-6 py-2">Shop Now</Button>
+                  </div>
+                )}
+
+                {/* Footer */}
+                <div className="pt-8 mt-8 border-t text-sm text-gray-500 space-y-1">
+                  <p>You are receiving this email because you subscribed to our newsletter.</p>
+                  <p>
+                    <a href="#" className="text-blue-600 hover:underline">
+                      Unsubscribe
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Settings Sidebar */}
+          <div className="space-y-6">
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="font-semibold mb-4">Settings</h3>
+                <div className="space-y-3">
+                  <Button variant="ghost" className="w-full justify-start" onClick={handleSaveDraft}>
+                    <Save className="h-4 w-4 mr-3" />
+                    Save as Draft
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start" onClick={handleSchedule}>
+                    <Clock className="h-4 w-4 mr-3" />
+                    Schedule Send
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="font-semibold mb-4">Details</h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Last Saved:</span>
+                    <span className="font-medium">Today at {format(new Date(), "h:mm a")}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Audience:</span>
+                    <span className="font-medium">All Subscribers</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Word Count:</span>
+                    <span className="font-medium">
+                      {sections.reduce((count, section) => {
+                        const text = section.content.replace(/<[^>]*>/g, "")
+                        return count + text.split(" ").filter((word) => word.length > 0).length
+                      }, 0) || 42}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Template:</span>
+                    <span className="font-medium capitalize">{template.replace("-", " ")}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
