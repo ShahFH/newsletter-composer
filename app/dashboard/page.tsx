@@ -183,22 +183,22 @@ export default function Dashboard() {
             <table className="w-full">
               <thead className="border-b bg-[#F9FAFB]">
                 <tr>
-                  <th className="text-left py-3 px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
+                  <th className="text-left py-[16px] px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
                     NAME
                   </th>
-                  <th className="text-left py-3 px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
+                  <th className="text-left px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
                     STATUS
                   </th>
-                  <th className="text-left py-3 px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
+                  <th className="text-left px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
                     SUBJECT
                   </th>
-                  <th className="text-left py-3 px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
+                  <th className="text-left px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
                     SENT
                   </th>
-                  <th className="text-left py-3 px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
+                  <th className="text-left px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
                     SCHEDULED
                   </th>
-                  <th className="text-left py-3 px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
+                  <th className="text-left px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
                     ACTION
                   </th>
                 </tr>

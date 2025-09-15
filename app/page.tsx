@@ -206,7 +206,7 @@ export default function NewsletterComposer() {
 
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-          <h1 className="text-3xl font-bold text-balance">New Composer</h1>
+          <h1 className="text-3xl font-bold text-balance">Compose Newsletter</h1>
           <div className="flex items-center space-x-3 mt-4 sm:mt-0">
             <Button variant="outline" size="sm" onClick={handlePreview}>
               <Eye className="h-4 w-4 mr-2" />
@@ -228,8 +228,8 @@ export default function NewsletterComposer() {
           {/* Left Column - Editor */}
           <div className="lg:col-span-2 space-y-6">
             {/* Subject Input */}
-            <div className="space-y-2">
-              <label htmlFor="subject" className="text-sm font-medium">
+            <div className=" flex flex-col gap-2 bg-white p-[25px] border border-[#E5E7EB] rounded-[6px]">
+              <label htmlFor="subject" className="text-sm font-medium mb-[8px] text-[#374151]">
                 Subject
               </label>
               <Input
@@ -237,7 +237,7 @@ export default function NewsletterComposer() {
                 placeholder="Enter your newsletter subject"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="text-lg"
+                className="text-[16px] text-[#6B7280] placeholder:text-[#6B7280] placeholder:text-[16px] bg-white py-[19px] px-[13px] rounedd-[6px]"
               />
             </div>
 
@@ -245,7 +245,7 @@ export default function NewsletterComposer() {
             <div className="space-y-4">
               <h2 className="text-lg font-semibold">Content Sections</h2>
               {sections.map((section, index) => (
-                <Card key={section.id} className="relative">
+                <div key={section.id} className="relative bg-white border border-[#E5E7EB] p-[24px] rounded-[6px]">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-base">{section.title}</CardTitle>
                     <div className="flex items-center space-x-2">
@@ -277,7 +277,7 @@ export default function NewsletterComposer() {
                       placeholder={`${section.title} content...`}
                     />
                   </CardContent>
-                </Card>
+                </div>
               ))}
 
               {/* Add Section Button */}
@@ -295,7 +295,7 @@ export default function NewsletterComposer() {
           {/* Right Column - Sidebar */}
           <div className="space-y-6">
             {/* Schedule Date */}
-            <Card>
+            <div style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }} className=" bg-white border border-[#E5E7EB] rounded-[6px] p-[25px]">
               <CardHeader>
                 <CardTitle className="text-base">Schedule Date</CardTitle>
               </CardHeader>
@@ -320,35 +320,17 @@ export default function NewsletterComposer() {
                 <Button
                   onClick={handleSchedule}
                   disabled={!scheduleDate}
-                  className="w-full bg-transparent"
+                  className="w-full bg-[#F3F4F6]"
                   variant="outline"
                 >
                   <Clock className="h-4 w-4 mr-2" />
                   Schedule Newsletter
                 </Button>
               </CardContent>
-            </Card>
-
-            {/* Layout Selector */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Layout</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Select value={template} onValueChange={setTemplate}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="simple">Simple</SelectItem>
-                    <SelectItem value="header-content-footer">Header + Content + Footer</SelectItem>
-                  </SelectContent>
-                </Select>
-              </CardContent>
-            </Card>
+            </div>
 
             {/* Email Preview */}
-            <Card>
+            <div style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }} className=" bg-white border border-[#E5E7EB] rounded-[6px] p-[25px]">
               <CardHeader>
                 <CardTitle className="text-base">Email Preview</CardTitle>
               </CardHeader>
@@ -357,11 +339,11 @@ export default function NewsletterComposer() {
                   <EmailPreview subject={subject} sections={sections} template={template} compact />
                 </div>
               </CardContent>
-            </Card>
+            </div>
 
             {/* Saved Newsletters */}
             {savedNewsletters.length > 0 && (
-              <Card>
+              <div style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }} className=" bg-white border border-[#E5E7EB] rounded-[6px] p-[25px]">
                 <CardHeader>
                   <CardTitle className="text-base">Recent Newsletters</CardTitle>
                 </CardHeader>
@@ -380,7 +362,7 @@ export default function NewsletterComposer() {
                     ))}
                   </div>
                 </CardContent>
-              </Card>
+              </div >
             )}
           </div>
         </div>

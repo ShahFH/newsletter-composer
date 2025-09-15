@@ -177,23 +177,23 @@ export default function NewsletterPreview() {
 
           {/* Settings Sidebar */}
           <div className="space-y-6">
-            <Card>
-              <CardContent className="p-6">
+            <div  className=" ">
+              <CardContent className="py-6">
                 <h3 className="font-semibold mb-4">Settings</h3>
                 <div className="space-y-3">
-                  <Button variant="ghost" className="w-full justify-start" onClick={handleSaveDraft}>
-                    <Save className="h-4 w-4 mr-3" />
+                  <Button variant="ghost" className="w-full justify-start border border-[#E5E7EB] rounded-[6px]" onClick={handleSaveDraft}>
+                    <Save className="h-4 mr-3" />
                     Save as Draft
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start" onClick={handleSchedule}>
-                    <Clock className="h-4 w-4 mr-3" />
+                  <Button variant="ghost" className="w-full justify-start border border-[#E5E7EB] rounded-[6px]" onClick={handleSchedule}>
+                    <Clock className="h-4 mr-3" />
                     Schedule Send
                   </Button>
                 </div>
               </CardContent>
-            </Card>
+            </div>
 
-            <Card>
+            <div style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }} className=" border border-[#E5E7EB] rounded-[6px]">
               <CardContent className="p-6">
                 <h3 className="font-semibold mb-4">Details</h3>
                 <div className="space-y-3 text-sm">
@@ -220,7 +220,7 @@ export default function NewsletterPreview() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </div>
           </div>
         </div>
       </div>
