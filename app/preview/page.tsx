@@ -1,12 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { render } from "@react-email/render"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { CardContent } from "@/components/ui/card"
 import { Edit, Send, Save, Clock } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { format } from "date-fns"
+import NewsletterEmail from "@/components/email-templates/newsletter-email"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,6 +43,7 @@ export default function NewsletterPreview() {
   const [template, setTemplate] = useState("header-content-footer")
   const [newsletterId, setNewsletterId] = useState<string | null>(null)
   const [isClient, setIsClient] = useState(false)
+  const [emailHtml, setEmailHtml] = useState<string>("")
   const [alertDialog, setAlertDialog] = useState<{
     isOpen: boolean
     title: string
@@ -68,6 +71,23 @@ export default function NewsletterPreview() {
       setNewsletterId(data.newsletterId || null) // Track if this is an existing newsletter
     }
   }, [isClient])
+
+  useEffect(() => {
+    const generateEmailHtml = async () => {
+      if (!isClient || !sections.length) return
+      
+      try {
+        const html = await render(
+          NewsletterEmail({ subject, sections, template })
+        )
+        setEmailHtml(html)
+      } catch (error) {
+        console.error("Error rendering email:", error)
+      }
+    }
+
+    generateEmailHtml()
+  }, [subject, sections, template, isClient])
 
   const handleBack = () => {
     router.push("/")
@@ -234,39 +254,35 @@ export default function NewsletterPreview() {
                 </Badge>
               </div>
 
-              <div className="space-y-6">
-                {/* Newsletter Title */}
-                <h2 className="text-2xl font-bold">{subject || "Huge Summer Sale!"}</h2>
-
-                {/* Newsletter Content */}
-                {sections.length > 0 && sections.some((s) => s.content.trim()) ? (
-                  sections.map(
-                    (section) =>
-                      section.content.trim() && (
-                        <div key={section.id} className="prose max-w-none">
-                          <div dangerouslySetInnerHTML={{ __html: section.content }} />
-                        </div>
-                      ),
-                  )
-                ) : (
-                  <div className="space-y-4">
-                    <p className="text-gray-700 leading-relaxed">
-                      Don't miss out on our biggest sale of the year. Get up to 50% off on selected items. Lorem ipsum
-                      dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore
-                      magna aliqua.
-                    </p>
-                    <Button className="bg-black text-white hover:bg-gray-800 px-6 py-2">Shop Now</Button>
-                  </div>
-                )}
-
-                {/* Footer */}
-                <div className="pt-8 mt-8 border-t text-sm text-gray-500 space-y-1">
-                  <p>You are receiving this email because you subscribed to our newsletter.</p>
-                  <p>
-                    <a href="#" className="text-blue-600 hover:underline">
-                      Unsubscribe
-                    </a>
-                  </p>
+              {/* Email Preview */}
+              <div className="border rounded-lg overflow-hidden">
+                <div className="bg-gray-100 px-4 py-2 text-sm text-gray-600 border-b">
+                  Email Preview (HTML Format)
+                </div>
+                <div className="bg-white">
+                  {emailHtml ? (
+                    <div dangerouslySetInnerHTML={{ __html: emailHtml }} />
+                  ) : (
+                    <div className="p-8 space-y-6">
+                      <h2 className="text-2xl font-bold">{subject || "Huge Summer Sale!"}</h2>
+                      <div className="space-y-4">
+                        <p className="text-gray-700 leading-relaxed">
+                          Don't miss out on our biggest sale of the year. Get up to 50% off on selected items. Lorem ipsum
+                          dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore
+                          magna aliqua.
+                        </p>
+                        <Button className="bg-black text-white hover:bg-gray-800 px-6 py-2">Shop Now</Button>
+                      </div>
+                      <div className="pt-8 mt-8 border-t text-sm text-gray-500 space-y-1">
+                        <p>You are receiving this email because you subscribed to our newsletter.</p>
+                        <p>
+                          <a href="#" className="text-blue-600 hover:underline">
+                            Unsubscribe
+                          </a>
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -329,6 +345,10 @@ export default function NewsletterPreview() {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Status:</span>
                     <span className="font-medium">{newsletterId ? "Editing Existing" : "New Newsletter"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Format:</span>
+                    <span className="font-medium">HTML Email</span>
                   </div>
                 </div>
               </CardContent>

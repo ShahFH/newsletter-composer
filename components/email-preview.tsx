@@ -1,6 +1,9 @@
 "use client"
 
+import { render } from "@react-email/render"
+import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
+import NewsletterEmail from "./email-templates/newsletter-email"
 
 interface NewsletterSection {
   id: string
@@ -16,6 +19,23 @@ interface EmailPreviewProps {
 }
 
 export function EmailPreview({ subject, sections, template, compact = false }: EmailPreviewProps) {
+  const [emailHtml, setEmailHtml] = useState<string>("")
+
+  useEffect(() => {
+    const generateEmailHtml = async () => {
+      try {
+        const html = await render(
+          NewsletterEmail({ subject, sections, template })
+        )
+        setEmailHtml(html)
+      } catch (error) {
+        console.error("Error rendering email:", error)
+      }
+    }
+
+    generateEmailHtml()
+  }, [subject, sections, template])
+
   const renderSimpleTemplate = () => (
     <div className="space-y-4">
       {sections.map((section) => (
@@ -85,12 +105,21 @@ export function EmailPreview({ subject, sections, template, compact = false }: E
     return (
       <div className="space-y-3">
         {subject && <div className="font-semibold text-sm border-b pb-2">{subject}</div>}
-        <div className="space-y-2">
-          {sections.slice(0, 2).map((section) => (
-            <div key={section.id} className="h-3 bg-gray-200 rounded"></div>
-          ))}
-          <div className="h-2 bg-gray-200 rounded w-3/4"></div>
-          <div className="h-2 bg-gray-200 rounded w-1/2"></div>
+        <div className="bg-white border rounded p-4 max-h-48 overflow-hidden">
+          {emailHtml ? (
+            <div 
+              className="text-xs scale-75 origin-top-left transform"
+              dangerouslySetInnerHTML={{ __html: emailHtml }}
+            />
+          ) : (
+            <div className="space-y-2">
+              {sections.slice(0, 2).map((section) => (
+                <div key={section.id} className="h-3 bg-gray-200 rounded"></div>
+              ))}
+              <div className="h-2 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-2 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          )}
         </div>
       </div>
     )
@@ -105,7 +134,14 @@ export function EmailPreview({ subject, sections, template, compact = false }: E
       </div>
 
       {/* Email Content */}
-      {template === "simple" ? renderSimpleTemplate() : renderHeaderFooterTemplate()}
+      {emailHtml ? (
+        <div 
+          className="prose prose-sm max-w-none"
+          dangerouslySetInnerHTML={{ __html: emailHtml }}
+        />
+      ) : (
+        template === "simple" ? renderSimpleTemplate() : renderHeaderFooterTemplate()
+      )}
     </Card>
   )
 }
