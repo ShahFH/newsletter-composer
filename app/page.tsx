@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import {
   Eye,
   Save,
-  Send,
+  SendHorizontal,
   GripVertical,
   Trash2,
   Plus,
@@ -208,16 +208,16 @@ export default function NewsletterComposer() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <h1 className="text-3xl font-bold text-balance">Compose Newsletter</h1>
           <div className="flex items-center space-x-3 mt-4 sm:mt-0">
-            <Button variant="outline" size="sm" onClick={handlePreview}>
+            <Button variant="outline" onClick={handlePreview} className="py-2 px-5">
               <Eye className="h-4 w-4 mr-2" />
               Preview
             </Button>
-            <Button variant="secondary" size="sm" onClick={handleSaveDraft}>
+            <Button variant="outline" onClick={handleSaveDraft} className="py-2 px-5">
               <Save className="h-4 w-4 mr-2" />
               Save as Draft
             </Button>
-            <Button size="sm" onClick={handleSend} className="bg-[#171717] text-white hover:bg-gray-800">
-              <Send className="h-4 w-4 mr-2" />
+            <Button onClick={handleSend} className="bg-[#171717] text-white hover:bg-gray-800 py-2 px-5">
+              <SendHorizontal className="h-4 w-4" />
               Send
             </Button>
           </div>

@@ -178,7 +178,7 @@ export default function NewsletterPreview() {
           {/* Settings Sidebar */}
           <div className="space-y-6">
             <div  className=" ">
-              <CardContent className="py-6">
+              <CardContent className="py-6 px-0">
                 <h3 className="font-semibold mb-4">Settings</h3>
                 <div className="space-y-3">
                   <Button variant="ghost" className="w-full justify-start border border-[#E5E7EB] rounded-[6px]" onClick={handleSaveDraft}>
