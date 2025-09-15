@@ -5,6 +5,17 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Search, MoreHorizontal, Eye, Send, Trash2, Edit } from "lucide-react"
 import { format } from "date-fns"
 import Link from "next/link"
@@ -25,6 +36,8 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<"all" | "drafts" | "scheduled" | "sent">("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [isClient, setIsClient] = useState(false)
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false)
+  const [successMessage, setSuccessMessage] = useState("")
 
   useEffect(() => {
     setIsClient(true)
@@ -86,7 +99,7 @@ export default function Dashboard() {
       sections: newsletter.sections,
       template: newsletter.template,
       newsletterId: newsletter.id,
-      isEditing: true
+      isEditing: true,
     }
 
     try {
@@ -107,24 +120,29 @@ export default function Dashboard() {
 
     try {
       localStorage.setItem("newsletters", JSON.stringify(updatedNewsletters))
-      alert("Newsletter sent successfully!")
+      setSuccessMessage(`"${newsletter.subject}" has been sent to your subscribers.`)
+      setShowSuccessDialog(true)
     } catch (error) {
       console.error("Failed to update newsletter:", error)
+      setSuccessMessage("Failed to send newsletter. Please try again.")
+      setShowSuccessDialog(true)
     }
   }
 
   const handleDelete = (newsletter: Newsletter) => {
     if (!isClient) return
 
-    if (confirm("Are you sure you want to delete this newsletter?")) {
-      const updatedNewsletters = newsletters.filter((n) => n.id !== newsletter.id)
-      setNewsletters(updatedNewsletters)
+    const updatedNewsletters = newsletters.filter((n) => n.id !== newsletter.id)
+    setNewsletters(updatedNewsletters)
 
-      try {
-        localStorage.setItem("newsletters", JSON.stringify(updatedNewsletters))
-      } catch (error) {
-        console.error("Failed to delete newsletter:", error)
-      }
+    try {
+      localStorage.setItem("newsletters", JSON.stringify(updatedNewsletters))
+      setSuccessMessage(`"${newsletter.subject}" has been deleted successfully.`)
+      setShowSuccessDialog(true)
+    } catch (error) {
+      console.error("Failed to delete newsletter:", error)
+      setSuccessMessage("Failed to delete newsletter. Please try again.")
+      setShowSuccessDialog(true)
     }
   }
 
@@ -171,10 +189,22 @@ export default function Dashboard() {
 
         <div className="flex items-center space-x-6 mb-6">
           {[
-            { key: "all", label: "All" },
-            { key: "drafts", label: "Drafts" },
-            { key: "scheduled", label: "Scheduled" },
-            { key: "sent", label: "Sent" },
+            {
+              key: "all",
+              label: "All",
+            },
+            {
+              key: "drafts",
+              label: "Drafts",
+            },
+            {
+              key: "scheduled",
+              label: "Scheduled",
+            },
+            {
+              key: "sent",
+              label: "Sent",
+            },
           ].map((tab) => (
             <button
               key={tab.key}
@@ -238,7 +268,9 @@ export default function Dashboard() {
                 ) : (
                   displayNewsletters.map((newsletter: any) => (
                     <tr key={newsletter.id} className="border-b hover:bg-gray-50">
-                      <td className="py-4 px-4 font-medium text-[#111827] text-[14px]">{newsletter.subject || "Untitled"}</td>
+                      <td className="py-4 px-4 font-medium text-[#111827] text-[14px]">
+                        {newsletter.subject || "Untitled"}
+                      </td>
                       <td className="py-4 px-4">{getStatusBadge(newsletter.status)}</td>
                       <td className="py-4 px-4 text-muted-foreground font-normal text-[14px] max-w-xs">
                         {newsletter.sections
@@ -274,10 +306,32 @@ export default function Dashboard() {
                                 Send
                               </DropdownMenuItem>
                             )}
-                            <DropdownMenuItem onClick={() => handleDelete(newsletter)} className="text-destructive">
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <DropdownMenuItem className="text-destructive" onSelect={(e) => e.preventDefault()}>
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Newsletter</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete "{newsletter.subject}"? This action cannot be
+                                    undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDelete(newsletter)}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>
@@ -289,6 +343,18 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Success</AlertDialogTitle>
+            <AlertDialogDescription>{successMessage}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowSuccessDialog(false)}>OK</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

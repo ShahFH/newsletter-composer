@@ -3,11 +3,19 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Badge } from "@/components/ui/badge"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import {
   Eye,
   Save,
@@ -19,7 +27,6 @@ import {
   Clock,
   FileText,
   ChevronLeft,
-  ChevronRight,
 } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
@@ -59,6 +66,7 @@ export default function NewsletterComposer() {
   const [isClient, setIsClient] = useState(false)
   const [editingNewsletterId, setEditingNewsletterId] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false)
 
   useEffect(() => {
     setIsClient(true)
@@ -74,7 +82,7 @@ export default function NewsletterComposer() {
         setSubject(template.subject || "")
         setSections(template.sections || defaultSections)
         setTemplate(template.template || "header-content-footer")
-        
+
         // Check if we're editing an existing newsletter
         if (template.newsletterId && template.isEditing) {
           setEditingNewsletterId(template.newsletterId)
@@ -147,7 +155,7 @@ export default function NewsletterComposer() {
               status,
               updatedAt: new Date(),
             }
-          : newsletter
+          : newsletter,
       )
       setSavedNewsletters(updated)
 
@@ -209,7 +217,7 @@ export default function NewsletterComposer() {
               status: "sent" as const,
               updatedAt: new Date(),
             }
-          : newsletter
+          : newsletter,
       )
       setSavedNewsletters(updated)
 
@@ -221,11 +229,8 @@ export default function NewsletterComposer() {
     } else {
       saveNewsletter("sent")
     }
-    
-    alert("Newsletter sent successfully!")
-    setTimeout(() => {
-      window.location.href = "/dashboard"
-    }, 500)
+
+    setShowSuccessDialog(true)
   }
 
   const handlePreview = () => {
@@ -247,6 +252,13 @@ export default function NewsletterComposer() {
     }
   }
 
+  const handleSuccessDialogClose = () => {
+    setShowSuccessDialog(false)
+    setTimeout(() => {
+      window.location.href = "/dashboard"
+    }, 100)
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Main Content */}
@@ -258,17 +270,13 @@ export default function NewsletterComposer() {
               Back
             </Button>
           </Link>
-          <div className="text-sm text-muted-foreground">
-            {isEditing ? "Edit Newsletter" : "Newsletter Composer"}
-          </div>
+          <div className="text-sm text-muted-foreground">{isEditing ? "Edit Newsletter" : "Newsletter Composer"}</div>
         </div>
 
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div className="flex items-center space-x-3">
-            <h1 className="text-3xl font-bold text-balance">
-              {isEditing ? "Edit Newsletter" : "Compose Newsletter"}
-            </h1>
+            <h1 className="text-3xl font-bold text-balance">{isEditing ? "Edit Newsletter" : "Compose Newsletter"}</h1>
             {isEditing && (
               <Badge variant="secondary" className="bg-blue-100 text-blue-800">
                 Editing
@@ -276,11 +284,11 @@ export default function NewsletterComposer() {
             )}
           </div>
           <div className="flex items-center space-x-3 mt-4 sm:mt-0">
-            <Button variant="outline" onClick={handlePreview} className="py-2 px-5">
+            <Button variant="outline" onClick={handlePreview} className="py-2 px-5 bg-transparent">
               <Eye className="h-4 w-4 mr-2" />
               Preview
             </Button>
-            <Button variant="outline" onClick={handleSaveDraft} className="py-2 px-5">
+            <Button variant="outline" onClick={handleSaveDraft} className="py-2 px-5 bg-transparent">
               <Save className="h-4 w-4 mr-2" />
               {isEditing ? "Save Changes" : "Save as Draft"}
             </Button>
@@ -363,7 +371,10 @@ export default function NewsletterComposer() {
           {/* Right Column - Sidebar */}
           <div className="space-y-6">
             {/* Schedule Date */}
-            <div style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }} className=" bg-white border border-[#E5E7EB] rounded-[6px] p-[25px]">
+            <div
+              style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }}
+              className=" bg-white border border-[#E5E7EB] rounded-[6px] p-[25px]"
+            >
               <CardHeader>
                 <CardTitle className="text-base">Schedule Date</CardTitle>
               </CardHeader>
@@ -398,7 +409,10 @@ export default function NewsletterComposer() {
             </div>
 
             {/* Email Preview */}
-            <div style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }} className=" bg-white border border-[#E5E7EB] rounded-[6px] p-[25px]">
+            <div
+              style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }}
+              className=" bg-white border border-[#E5E7EB] rounded-[6px] p-[25px]"
+            >
               <CardHeader>
                 <CardTitle className="text-base">Email Preview</CardTitle>
               </CardHeader>
@@ -411,7 +425,10 @@ export default function NewsletterComposer() {
 
             {/* Edit Status or Saved Newsletters */}
             {isEditing ? (
-              <div style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }} className=" bg-white border border-[#E5E7EB] rounded-[6px] p-[25px]">
+              <div
+                style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }}
+                className=" bg-white border border-[#E5E7EB] rounded-[6px] p-[25px]"
+              >
                 <CardHeader>
                   <CardTitle className="text-base">Edit Status</CardTitle>
                 </CardHeader>
@@ -431,14 +448,20 @@ export default function NewsletterComposer() {
               </div>
             ) : (
               savedNewsletters.length > 0 && (
-                <div style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }} className=" bg-white border border-[#E5E7EB] rounded-[6px] px-[5px] py-[20px]">
+                <div
+                  style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }}
+                  className=" bg-white border border-[#E5E7EB] rounded-[6px] px-[5px] py-[20px]"
+                >
                   <CardHeader>
                     <CardTitle className="text-base">Recent Newsletters</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
                       {savedNewsletters.slice(-3).map((newsletter) => (
-                        <div key={newsletter.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                        <div
+                          key={newsletter.id}
+                          className="flex items-center justify-between p-2 rounded-lg bg-muted/50"
+                        >
                           <div className="flex items-center space-x-2">
                             <FileText className="h-4 w-4" />
                             <span className="text-sm ">{newsletter.subject || "Untitled"}</span>
@@ -450,12 +473,27 @@ export default function NewsletterComposer() {
                       ))}
                     </div>
                   </CardContent>
-                </div >
+                </div>
               )
             )}
           </div>
         </div>
       </div>
+      {/* Success Dialog */}
+      <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Newsletter Sent Successfully!</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your newsletter has been sent successfully to all subscribers. You can view the sent newsletter in your
+              dashboard.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={handleSuccessDialogClose}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -3,10 +3,19 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { ArrowLeft, Edit, Send, Save, Clock } from "lucide-react"
+import { CardContent } from "@/components/ui/card"
+import { Edit, Send, Save, Clock } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { format } from "date-fns"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 interface NewsletterSection {
   id: string
@@ -32,6 +41,16 @@ export default function NewsletterPreview() {
   const [template, setTemplate] = useState("header-content-footer")
   const [newsletterId, setNewsletterId] = useState<string | null>(null)
   const [isClient, setIsClient] = useState(false)
+  const [alertDialog, setAlertDialog] = useState<{
+    isOpen: boolean
+    title: string
+    description: string
+    action?: () => void
+  }>({
+    isOpen: false,
+    title: "",
+    description: "",
+  })
 
   useEffect(() => {
     setIsClient(true)
@@ -63,7 +82,7 @@ export default function NewsletterPreview() {
       sections,
       template,
       newsletterId, // Pass the newsletter ID for editing
-      isEditing: true
+      isEditing: true,
     }
 
     try {
@@ -81,17 +100,19 @@ export default function NewsletterPreview() {
       // Update existing newsletter status
       const saved = localStorage.getItem("newsletters")
       if (saved) {
-        const newsletters = JSON.parse(saved).map((n: any) => 
-          n.id === newsletterId 
-            ? { ...n, status: "sent", updatedAt: new Date() }
-            : n
+        const newsletters = JSON.parse(saved).map((n: any) =>
+          n.id === newsletterId ? { ...n, status: "sent", updatedAt: new Date() } : n,
         )
         localStorage.setItem("newsletters", JSON.stringify(newsletters))
       }
     }
 
-    alert("Newsletter sent successfully!")
-    router.push("/dashboard")
+    setAlertDialog({
+      isOpen: true,
+      title: "Newsletter Sent Successfully!",
+      description: "Your newsletter has been sent to all subscribers.",
+      action: () => router.push("/dashboard"),
+    })
   }
 
   const handleSaveDraft = () => {
@@ -101,20 +122,24 @@ export default function NewsletterPreview() {
       // Update existing newsletter
       const saved = localStorage.getItem("newsletters")
       if (saved) {
-        const newsletters = JSON.parse(saved).map((n: any) => 
-          n.id === newsletterId 
-            ? { 
-                ...n, 
+        const newsletters = JSON.parse(saved).map((n: any) =>
+          n.id === newsletterId
+            ? {
+                ...n,
                 subject,
                 sections,
                 template,
                 updatedAt: new Date(),
-                status: "draft"
+                status: "draft",
               }
-            : n
+            : n,
         )
         localStorage.setItem("newsletters", JSON.stringify(newsletters))
-        alert("Newsletter updated successfully!")
+        setAlertDialog({
+          isOpen: true,
+          title: "Newsletter Updated Successfully!",
+          description: "Your changes have been saved to the draft.",
+        })
       }
     } else {
       // Create new newsletter
@@ -133,12 +158,20 @@ export default function NewsletterPreview() {
       newsletters.push(newsletter)
       localStorage.setItem("newsletters", JSON.stringify(newsletters))
 
-      alert("Newsletter saved as draft!")
+      setAlertDialog({
+        isOpen: true,
+        title: "Newsletter Saved as Draft!",
+        description: "Your newsletter has been saved and can be edited later.",
+      })
     }
   }
 
   const handleSchedule = () => {
-    alert("Schedule functionality would open here")
+    setAlertDialog({
+      isOpen: true,
+      title: "Schedule Newsletter",
+      description: "Schedule functionality is coming soon. You can save as draft for now.",
+    })
   }
 
   if (!isClient) {
@@ -245,11 +278,19 @@ export default function NewsletterPreview() {
               <CardContent className="py-6 px-0">
                 <h3 className="font-semibold mb-4">Settings</h3>
                 <div className="space-y-3">
-                  <Button variant="ghost" className="w-full justify-start border border-[#E5E7EB] rounded-[6px]" onClick={handleSaveDraft}>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start border border-[#E5E7EB] rounded-[6px]"
+                    onClick={handleSaveDraft}
+                  >
                     <Save className="h-4 mr-3" />
                     {newsletterId ? "Save Changes" : "Save as Draft"}
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start border border-[#E5E7EB] rounded-[6px]" onClick={handleSchedule}>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start border border-[#E5E7EB] rounded-[6px]"
+                    onClick={handleSchedule}
+                  >
                     <Clock className="h-4 mr-3" />
                     Schedule Send
                   </Button>
@@ -257,7 +298,10 @@ export default function NewsletterPreview() {
               </CardContent>
             </div>
 
-            <div style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }} className=" border border-[#E5E7EB] rounded-[6px]">
+            <div
+              style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }}
+              className=" border border-[#E5E7EB] rounded-[6px]"
+            >
               <CardContent className="p-6">
                 <h3 className="font-semibold mb-4">Details</h3>
                 <div className="space-y-3 text-sm">
@@ -292,6 +336,29 @@ export default function NewsletterPreview() {
           </div>
         </div>
       </div>
+      <AlertDialog
+        open={alertDialog.isOpen}
+        onOpenChange={(open) => setAlertDialog((prev) => ({ ...prev, isOpen: open }))}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{alertDialog.title}</AlertDialogTitle>
+            <AlertDialogDescription>{alertDialog.description}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={() => {
+                setAlertDialog((prev) => ({ ...prev, isOpen: false }))
+                if (alertDialog.action) {
+                  alertDialog.action()
+                }
+              }}
+            >
+              OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
