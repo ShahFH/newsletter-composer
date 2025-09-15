@@ -13,7 +13,6 @@ import Image from "next/image"
 export const metadata: Metadata = {
   title: "Newsletter Composer",
   description: "Create and manage newsletters with ease",
-  generator: "v0.app",
 }
 
 export default function RootLayout({
