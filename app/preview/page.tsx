@@ -7,6 +7,10 @@ import { CardContent } from "@/components/ui/card"
 import { Edit, Send, Save, Clock } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { format } from "date-fns"
+import { render } from "@react-email/components"
+import { SimpleTemplate } from "@/components/email-templates/simple-template"
+import { HeaderFooterTemplate } from "@/components/email-templates/header-footer-template"
+import { ProfessionalTemplate } from "@/components/email-templates/professional-template"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,6 +45,7 @@ export default function NewsletterPreview() {
   const [template, setTemplate] = useState("header-content-footer")
   const [newsletterId, setNewsletterId] = useState<string | null>(null)
   const [isClient, setIsClient] = useState(false)
+  const [emailHtml, setEmailHtml] = useState<string>("")
   const [alertDialog, setAlertDialog] = useState<{
     isOpen: boolean
     title: string
@@ -69,6 +74,50 @@ export default function NewsletterPreview() {
     }
   }, [isClient])
 
+  useEffect(() => {
+    if (subject || sections.length > 0) {
+      generateEmailHtml()
+    }
+  }, [subject, sections, template])
+
+  const generateEmailHtml = () => {
+    try {
+      let EmailComponent
+      
+      switch (template) {
+        case "simple":
+          EmailComponent = SimpleTemplate
+          break
+        case "professional":
+          EmailComponent = ProfessionalTemplate
+          break
+        case "header-content-footer":
+        default:
+          EmailComponent = HeaderFooterTemplate
+          break
+      }
+      
+      const htmlContent = render(<EmailComponent subject={subject} sections={sections} />)
+      setEmailHtml(htmlContent)
+    } catch (error) {
+      console.error("Error generating email HTML:", error)
+      setEmailHtml("")
+    }
+  }
+
+  const downloadEmailHtml = () => {
+    if (!emailHtml) return
+    
+    const blob = new Blob([emailHtml], { type: 'text/html' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${subject || 'newsletter'}.html`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
   const handleBack = () => {
     router.push("/")
   }
@@ -216,6 +265,9 @@ export default function NewsletterPreview() {
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </Button>
+            <Button variant="outline" onClick={downloadEmailHtml} disabled={!emailHtml}>
+              Download HTML
+            </Button>
             <Button onClick={handleSend} className="bg-black text-white hover:bg-gray-800">
               <Send className="h-4 w-4 mr-2" />
               Send
@@ -234,6 +286,13 @@ export default function NewsletterPreview() {
                 </Badge>
               </div>
 
+              {/* React Email Rendered Content */}
+              {emailHtml ? (
+                <div 
+                  className="border rounded-lg p-4 bg-gray-50"
+                  dangerouslySetInnerHTML={{ __html: emailHtml }}
+                />
+              ) : (
               <div className="space-y-6">
                 {/* Newsletter Title */}
                 <h2 className="text-2xl font-bold">{subject || "Huge Summer Sale!"}</h2>
@@ -331,6 +390,7 @@ export default function NewsletterPreview() {
                     <span className="font-medium">{newsletterId ? "Editing Existing" : "New Newsletter"}</span>
                   </div>
                 </div>
+              )}
               </CardContent>
             </div>
           </div>
@@ -362,3 +422,8 @@ export default function NewsletterPreview() {
     </div>
   )
 }
+
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Email HTML:</span>
+                    <span className="font-medium">{emailHtml ? "Generated" : "Not Available"}</span>
+                  </div>

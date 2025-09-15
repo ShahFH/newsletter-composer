@@ -1,4 +1,5 @@
 import { Html, Head, Body, Container, Section, Text, Button, Hr } from "@react-email/components"
+import * as React from "react"
 
 interface SimpleTemplateProps {
   subject: string
@@ -9,7 +10,7 @@ interface SimpleTemplateProps {
   }>
 }
 
-export default function SimpleTemplate({ subject, sections }: SimpleTemplateProps) {
+export function SimpleTemplate({ subject, sections }: SimpleTemplateProps) {
   return (
     <Html>
       <Head />
@@ -70,3 +71,5 @@ export default function SimpleTemplate({ subject, sections }: SimpleTemplateProp
     </Html>
   )
 }
+
+export default SimpleTemplate

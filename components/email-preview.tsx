@@ -1,6 +1,10 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
+import { render } from "@react-email/components"
+import { SimpleTemplate } from "./email-templates/simple-template"
+import { HeaderFooterTemplate } from "./email-templates/header-footer-template"
+import { ProfessionalTemplate } from "./email-templates/professional-template"
 
 interface NewsletterSection {
   id: string
@@ -16,6 +20,31 @@ interface EmailPreviewProps {
 }
 
 export function EmailPreview({ subject, sections, template, compact = false }: EmailPreviewProps) {
+  const renderEmailTemplate = () => {
+    try {
+      let EmailComponent
+      
+      switch (template) {
+        case "simple":
+          EmailComponent = SimpleTemplate
+          break
+        case "professional":
+          EmailComponent = ProfessionalTemplate
+          break
+        case "header-content-footer":
+        default:
+          EmailComponent = HeaderFooterTemplate
+          break
+      }
+      
+      const htmlContent = render(<EmailComponent subject={subject} sections={sections} />)
+      return htmlContent
+    } catch (error) {
+      console.error("Error rendering email template:", error)
+      return null
+    }
+  }
+
   const renderSimpleTemplate = () => (
     <div className="space-y-4">
       {sections.map((section) => (
@@ -106,6 +135,11 @@ export function EmailPreview({ subject, sections, template, compact = false }: E
 
       {/* Email Content */}
       {template === "simple" ? renderSimpleTemplate() : renderHeaderFooterTemplate()}
+      
+      {/* Hidden HTML Email Content for Export */}
+      <div className="hidden" id="email-html-content">
+        <div dangerouslySetInnerHTML={{ __html: renderEmailTemplate() || "" }} />
+      div>
     </Card>
   )
 }

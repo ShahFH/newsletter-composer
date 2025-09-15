@@ -1,4 +1,5 @@
 import { Html, Head, Body, Container, Section, Text, Button } from "@react-email/components"
+import * as React from "react"
 
 interface HeaderFooterTemplateProps {
   subject: string
@@ -9,7 +10,7 @@ interface HeaderFooterTemplateProps {
   }>
 }
 
-export default function HeaderFooterTemplate({ subject, sections }: HeaderFooterTemplateProps) {
+export function HeaderFooterTemplate({ subject, sections }: HeaderFooterTemplateProps) {
   const headerSection = sections.find((s) => s.title.toLowerCase() === "header")
   const bodySection = sections.find((s) => s.title.toLowerCase() === "body")
   const footerSection = sections.find((s) => s.title.toLowerCase() === "footer")
@@ -83,3 +84,5 @@ export default function HeaderFooterTemplate({ subject, sections }: HeaderFooter
     </Html>
   )
 }
+
+export default HeaderFooterTemplate
