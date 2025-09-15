@@ -8,7 +8,7 @@ import { Suspense } from "react"
 import "./globals.css"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-
+import Image from "next/image"
 
 export const metadata: Metadata = {
   title: "Newsletter Composer",
@@ -46,7 +46,15 @@ export default function RootLayout({
               Contact
               </Button>
               
-              <div className="w-8 h-8 rounded-full bg-gray-300"></div>
+              <div className="w-8 h-8 rounded-full bg-gray-300">
+                <Image
+                  src="/Image.png"
+                  alt="User Avatar"
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                />
+              </div>
             </div>
           </div>
         </div>

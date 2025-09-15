@@ -94,16 +94,14 @@ export default function Templates() {
         </div>
 
         {/* Templates Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {templates.map((template) => {
             const IconComponent = template.icon
             return (
-              <Card key={template.id} className="cursor-pointer hover:shadow-lg transition-shadow">
+              <Card style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }} key={template.id} className="cursor-pointer rounded-[6px]">
                 <CardHeader>
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <IconComponent className="h-6 w-6 text-blue-600" />
-                    </div>
+                    
                     <div>
                       <CardTitle className="text-lg">{template.name}</CardTitle>
                       <p className="text-sm text-muted-foreground">{template.description}</p>
@@ -114,24 +112,7 @@ export default function Templates() {
                   <div className="bg-gray-50 rounded-lg p-4 mb-4 min-h-[200px]">
                     <div className="space-y-3">
                       <div className="font-semibold text-sm border-b pb-2">{template.preview.subject}</div>
-                      {template.id === "simple" ? (
-                        <div className="space-y-2">
-                          <div className="h-4 bg-blue-200 rounded w-3/4"></div>
-                          <div className="h-3 bg-gray-200 rounded"></div>
-                          <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                          <div className="h-2 bg-gray-300 rounded w-1/2 mt-4"></div>
-                        </div>
-                      ) : (
-                        <div className="space-y-2">
-                          <div className="h-6 bg-gray-800 rounded mb-3"></div>
-                          <div className="h-3 bg-blue-200 rounded w-1/2"></div>
-                          <div className="h-2 bg-gray-200 rounded"></div>
-                          <div className="h-2 bg-gray-200 rounded w-3/4"></div>
-                          <div className="h-3 bg-blue-200 rounded w-2/3 mt-3"></div>
-                          <div className="h-2 bg-gray-200 rounded w-1/2"></div>
-                          <div className="h-4 bg-gray-800 rounded mt-3"></div>
-                        </div>
-                      )}
+                      
                     </div>
                   </div>
 
