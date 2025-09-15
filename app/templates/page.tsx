@@ -24,7 +24,7 @@ const templates = [
   {
     id: "professional",
     name: "Professional Template",
-    description: "Modern design with header, content sections, and footer",
+    description: "Modern UI with header, content sections, and footer",
     icon: Sparkles,
     preview: {
       subject: "Monthly Update - January 2024",

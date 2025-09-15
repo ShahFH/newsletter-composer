@@ -57,6 +57,8 @@ export default function NewsletterComposer() {
   const [scheduleDate, setScheduleDate] = useState<Date>()
   const [savedNewsletters, setSavedNewsletters] = useState<Newsletter[]>([])
   const [isClient, setIsClient] = useState(false)
+  const [editingNewsletterId, setEditingNewsletterId] = useState<string | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {
     setIsClient(true)
@@ -69,9 +71,15 @@ export default function NewsletterComposer() {
       const templateData = localStorage.getItem("selected-template")
       if (templateData) {
         const template = JSON.parse(templateData)
-        setSubject(template.subject)
-        setSections(template.sections)
-        setTemplate(template.template)
+        setSubject(template.subject || "")
+        setSections(template.sections || defaultSections)
+        setTemplate(template.template || "header-content-footer")
+        
+        // Check if we're editing an existing newsletter
+        if (template.newsletterId && template.isEditing) {
+          setEditingNewsletterId(template.newsletterId)
+          setIsEditing(true)
+        }
 
         // Clear the template data after loading
         localStorage.removeItem("selected-template")
@@ -126,24 +134,49 @@ export default function NewsletterComposer() {
   const saveNewsletter = (status: "draft" | "scheduled") => {
     if (!isClient) return
 
-    const newsletter: Newsletter = {
-      id: Date.now().toString(),
-      subject,
-      sections,
-      template,
-      scheduleDate: status === "scheduled" ? scheduleDate : undefined,
-      status,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }
+    if (isEditing && editingNewsletterId) {
+      // Update existing newsletter
+      const updated = savedNewsletters.map((newsletter) =>
+        newsletter.id === editingNewsletterId
+          ? {
+              ...newsletter,
+              subject,
+              sections,
+              template,
+              scheduleDate: status === "scheduled" ? scheduleDate : newsletter.scheduleDate,
+              status,
+              updatedAt: new Date(),
+            }
+          : newsletter
+      )
+      setSavedNewsletters(updated)
 
-    const updated = [...savedNewsletters, newsletter]
-    setSavedNewsletters(updated)
+      try {
+        localStorage.setItem("newsletters", JSON.stringify(updated))
+      } catch (error) {
+        console.error("Failed to update newsletter in localStorage:", error)
+      }
+    } else {
+      // Create new newsletter
+      const newsletter: Newsletter = {
+        id: Date.now().toString(),
+        subject,
+        sections,
+        template,
+        scheduleDate: status === "scheduled" ? scheduleDate : undefined,
+        status,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
 
-    try {
-      localStorage.setItem("newsletters", JSON.stringify(updated))
-    } catch (error) {
-      console.error("Failed to save newsletter to localStorage:", error)
+      const updated = [...savedNewsletters, newsletter]
+      setSavedNewsletters(updated)
+
+      try {
+        localStorage.setItem("newsletters", JSON.stringify(updated))
+      } catch (error) {
+        console.error("Failed to save newsletter to localStorage:", error)
+      }
     }
   }
 
@@ -164,9 +197,35 @@ export default function NewsletterComposer() {
   }
 
   const handleSend = () => {
-    saveNewsletter("sent")
-    // In a real app, this would trigger the email sending
+    if (isEditing && editingNewsletterId) {
+      // Update existing newsletter status to sent
+      const updated = savedNewsletters.map((newsletter) =>
+        newsletter.id === editingNewsletterId
+          ? {
+              ...newsletter,
+              subject,
+              sections,
+              template,
+              status: "sent" as const,
+              updatedAt: new Date(),
+            }
+          : newsletter
+      )
+      setSavedNewsletters(updated)
+
+      try {
+        localStorage.setItem("newsletters", JSON.stringify(updated))
+      } catch (error) {
+        console.error("Failed to update newsletter in localStorage:", error)
+      }
+    } else {
+      saveNewsletter("sent")
+    }
+    
     alert("Newsletter sent successfully!")
+    setTimeout(() => {
+      window.location.href = "/dashboard"
+    }, 500)
   }
 
   const handlePreview = () => {
@@ -176,6 +235,7 @@ export default function NewsletterComposer() {
       subject,
       sections,
       template,
+      newsletterId: editingNewsletterId, // Pass the newsletter ID if editing
       timestamp: Date.now(),
     }
 
@@ -189,9 +249,6 @@ export default function NewsletterComposer() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      
-
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center space-x-4 mb-6">
@@ -201,12 +258,23 @@ export default function NewsletterComposer() {
               Back
             </Button>
           </Link>
-          <div className="text-sm text-muted-foreground">Newsletter Composer</div>
+          <div className="text-sm text-muted-foreground">
+            {isEditing ? "Edit Newsletter" : "Newsletter Composer"}
+          </div>
         </div>
 
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-          <h1 className="text-3xl font-bold text-balance">Compose Newsletter</h1>
+          <div className="flex items-center space-x-3">
+            <h1 className="text-3xl font-bold text-balance">
+              {isEditing ? "Edit Newsletter" : "Compose Newsletter"}
+            </h1>
+            {isEditing && (
+              <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                Editing
+              </Badge>
+            )}
+          </div>
           <div className="flex items-center space-x-3 mt-4 sm:mt-0">
             <Button variant="outline" onClick={handlePreview} className="py-2 px-5">
               <Eye className="h-4 w-4 mr-2" />
@@ -214,7 +282,7 @@ export default function NewsletterComposer() {
             </Button>
             <Button variant="outline" onClick={handleSaveDraft} className="py-2 px-5">
               <Save className="h-4 w-4 mr-2" />
-              Save as Draft
+              {isEditing ? "Save Changes" : "Save as Draft"}
             </Button>
             <Button onClick={handleSend} className="bg-[#171717] text-white hover:bg-gray-800 py-2 px-5">
               <SendHorizontal className="h-4 w-4" />
@@ -341,28 +409,49 @@ export default function NewsletterComposer() {
               </CardContent>
             </div>
 
-            {/* Saved Newsletters */}
-            {savedNewsletters.length > 0 && (
+            {/* Edit Status or Saved Newsletters */}
+            {isEditing ? (
               <div style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }} className=" bg-white border border-[#E5E7EB] rounded-[6px] p-[25px]">
                 <CardHeader>
-                  <CardTitle className="text-base">Recent Newsletters</CardTitle>
+                  <CardTitle className="text-base">Edit Status</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
-                    {savedNewsletters.slice(-3).map((newsletter) => (
-                      <div key={newsletter.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
-                        <div className="flex items-center space-x-2">
-                          <FileText className="h-4 w-4" />
-                          <span className="text-sm truncate">{newsletter.subject || "Untitled"}</span>
-                        </div>
-                        <Badge variant="secondary" className="text-xs">
-                          {newsletter.status}
-                        </Badge>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-2 rounded-lg bg-blue-50">
+                      <div className="flex items-center space-x-2">
+                        <FileText className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm text-blue-800">Editing existing newsletter</span>
                       </div>
-                    ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Changes will be saved to the original newsletter when you save or send.
+                    </p>
                   </div>
                 </CardContent>
-              </div >
+              </div>
+            ) : (
+              savedNewsletters.length > 0 && (
+                <div style={{ boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)" }} className=" bg-white border border-[#E5E7EB] rounded-[6px] px-[5px] py-[20px]">
+                  <CardHeader>
+                    <CardTitle className="text-base">Recent Newsletters</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {savedNewsletters.slice(-3).map((newsletter) => (
+                        <div key={newsletter.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                          <div className="flex items-center space-x-2">
+                            <FileText className="h-4 w-4" />
+                            <span className="text-sm ">{newsletter.subject || "Untitled"}</span>
+                          </div>
+                          <Badge variant="secondary" className="">
+                            {newsletter.status}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </div >
+              )
             )}
           </div>
         </div>

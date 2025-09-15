@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Search, MoreHorizontal, Eye, Send, Trash2 } from "lucide-react"
+import { Search, MoreHorizontal, Eye, Send, Trash2, Edit } from "lucide-react"
 import { format } from "date-fns"
 import Link from "next/link"
 
@@ -33,6 +33,10 @@ export default function Dashboard() {
   useEffect(() => {
     if (!isClient) return
 
+    loadNewsletters()
+  }, [isClient])
+
+  const loadNewsletters = () => {
     try {
       const saved = localStorage.getItem("newsletters")
       if (saved) {
@@ -47,7 +51,7 @@ export default function Dashboard() {
     } catch (error) {
       console.error("Failed to load newsletters:", error)
     }
-  }, [isClient])
+  }
 
   const filteredNewsletters = newsletters.filter((newsletter) => {
     const matchesTab = activeTab === "all" || newsletter.status === activeTab
@@ -62,6 +66,7 @@ export default function Dashboard() {
       subject: newsletter.subject,
       sections: newsletter.sections,
       template: newsletter.template,
+      newsletterId: newsletter.id, // Pass the newsletter ID
       timestamp: Date.now(),
     }
 
@@ -70,6 +75,25 @@ export default function Dashboard() {
       window.location.href = "/preview"
     } catch (error) {
       console.error("Failed to save preview data:", error)
+    }
+  }
+
+  const handleEdit = (newsletter: Newsletter) => {
+    if (!isClient) return
+
+    const editData = {
+      subject: newsletter.subject,
+      sections: newsletter.sections,
+      template: newsletter.template,
+      newsletterId: newsletter.id,
+      isEditing: true
+    }
+
+    try {
+      localStorage.setItem("selected-template", JSON.stringify(editData))
+      window.location.href = "/"
+    } catch (error) {
+      console.error("Failed to save edit data:", error)
     }
   }
 
@@ -133,8 +157,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center space-x-4 mb-6">
           <div className="text-sm text-muted-foreground">Newsletters</div>
@@ -241,6 +263,10 @@ export default function Dashboard() {
                             <DropdownMenuItem onClick={() => handlePreview(newsletter)}>
                               <Eye className="h-4 w-4 mr-2" />
                               Preview
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleEdit(newsletter)}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit
                             </DropdownMenuItem>
                             {newsletter.status !== "sent" && (
                               <DropdownMenuItem onClick={() => handleSend(newsletter)}>

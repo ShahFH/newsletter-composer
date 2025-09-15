@@ -14,11 +14,23 @@ interface NewsletterSection {
   content: string
 }
 
+interface Newsletter {
+  id: string
+  subject: string
+  sections: NewsletterSection[]
+  template: string
+  scheduleDate?: Date
+  status: "draft" | "scheduled" | "sent"
+  createdAt: Date
+  updatedAt: Date
+}
+
 export default function NewsletterPreview() {
   const router = useRouter()
   const [subject, setSubject] = useState("")
   const [sections, setSections] = useState<NewsletterSection[]>([])
   const [template, setTemplate] = useState("header-content-footer")
+  const [newsletterId, setNewsletterId] = useState<string | null>(null)
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
@@ -34,6 +46,7 @@ export default function NewsletterPreview() {
       setSubject(data.subject || "")
       setSections(data.sections || [])
       setTemplate(data.template || "header-content-footer")
+      setNewsletterId(data.newsletterId || null) // Track if this is an existing newsletter
     }
   }, [isClient])
 
@@ -42,33 +55,86 @@ export default function NewsletterPreview() {
   }
 
   const handleEdit = () => {
-    router.push("/")
+    if (!isClient) return
+
+    // Save current data to localStorage for the composer to pick up
+    const editData = {
+      subject,
+      sections,
+      template,
+      newsletterId, // Pass the newsletter ID for editing
+      isEditing: true
+    }
+
+    try {
+      localStorage.setItem("selected-template", JSON.stringify(editData))
+      router.push("/")
+    } catch (error) {
+      console.error("Failed to save edit data:", error)
+    }
   }
 
   const handleSend = () => {
+    if (!isClient) return
+
+    if (newsletterId) {
+      // Update existing newsletter status
+      const saved = localStorage.getItem("newsletters")
+      if (saved) {
+        const newsletters = JSON.parse(saved).map((n: any) => 
+          n.id === newsletterId 
+            ? { ...n, status: "sent", updatedAt: new Date() }
+            : n
+        )
+        localStorage.setItem("newsletters", JSON.stringify(newsletters))
+      }
+    }
+
     alert("Newsletter sent successfully!")
-    router.push("/")
+    router.push("/dashboard")
   }
 
   const handleSaveDraft = () => {
     if (!isClient) return
 
-    const newsletter = {
-      id: Date.now().toString(),
-      subject,
-      sections,
-      template,
-      status: "draft",
-      createdAt: new Date(),
-      updatedAt: new Date(),
+    if (newsletterId) {
+      // Update existing newsletter
+      const saved = localStorage.getItem("newsletters")
+      if (saved) {
+        const newsletters = JSON.parse(saved).map((n: any) => 
+          n.id === newsletterId 
+            ? { 
+                ...n, 
+                subject,
+                sections,
+                template,
+                updatedAt: new Date(),
+                status: "draft"
+              }
+            : n
+        )
+        localStorage.setItem("newsletters", JSON.stringify(newsletters))
+        alert("Newsletter updated successfully!")
+      }
+    } else {
+      // Create new newsletter
+      const newsletter = {
+        id: Date.now().toString(),
+        subject,
+        sections,
+        template,
+        status: "draft",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+
+      const saved = localStorage.getItem("newsletters")
+      const newsletters = saved ? JSON.parse(saved) : []
+      newsletters.push(newsletter)
+      localStorage.setItem("newsletters", JSON.stringify(newsletters))
+
+      alert("Newsletter saved as draft!")
     }
-
-    const saved = localStorage.getItem("newsletters")
-    const newsletters = saved ? JSON.parse(saved) : []
-    newsletters.push(newsletter)
-    localStorage.setItem("newsletters", JSON.stringify(newsletters))
-
-    alert("Newsletter saved as draft!")
   }
 
   const handleSchedule = () => {
@@ -109,8 +175,6 @@ export default function NewsletterPreview() {
 
   return (
     <div className="min-h-screen bg-background">
-      
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <h1 className="text-3xl font-bold text-balance">Newsletter Preview</h1>
@@ -133,7 +197,7 @@ export default function NewsletterPreview() {
               <div className="flex items-center gap-3 mb-6">
                 <h1 className="text-xl font-bold">Subject: {subject || "Untitled Newsletter"}</h1>
                 <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 text-xs">
-                  Draft
+                  {newsletterId ? "Draft" : "scheduled"}
                 </Badge>
               </div>
 
@@ -177,13 +241,13 @@ export default function NewsletterPreview() {
 
           {/* Settings Sidebar */}
           <div className="space-y-6">
-            <div  className=" ">
+            <div className=" ">
               <CardContent className="py-6 px-0">
                 <h3 className="font-semibold mb-4">Settings</h3>
                 <div className="space-y-3">
                   <Button variant="ghost" className="w-full justify-start border border-[#E5E7EB] rounded-[6px]" onClick={handleSaveDraft}>
                     <Save className="h-4 mr-3" />
-                    Save as Draft
+                    {newsletterId ? "Save Changes" : "Save as Draft"}
                   </Button>
                   <Button variant="ghost" className="w-full justify-start border border-[#E5E7EB] rounded-[6px]" onClick={handleSchedule}>
                     <Clock className="h-4 mr-3" />
@@ -217,6 +281,10 @@ export default function NewsletterPreview() {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Template:</span>
                     <span className="font-medium capitalize">{template.replace("-", " ")}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Status:</span>
+                    <span className="font-medium">{newsletterId ? "Editing Existing" : "New Newsletter"}</span>
                   </div>
                 </div>
               </CardContent>
