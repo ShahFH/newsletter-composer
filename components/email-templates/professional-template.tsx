@@ -1,4 +1,5 @@
 import { Html, Head, Body, Container, Section, Text, Button, Hr, Heading } from "@react-email/components"
+import * as React from "react"
 
 interface ProfessionalTemplateProps {
   subject: string
@@ -9,7 +10,7 @@ interface ProfessionalTemplateProps {
   }>
 }
 
-export default function ProfessionalTemplate({ subject, sections }: ProfessionalTemplateProps) {
+export function ProfessionalTemplate({ subject, sections }: ProfessionalTemplateProps) {
   const headerSection = sections.find((s) => s.title.toLowerCase() === "header")
   const bodySection = sections.find((s) => s.title.toLowerCase() === "body")
   const footerSection = sections.find((s) => s.title.toLowerCase() === "footer")
@@ -123,3 +124,5 @@ export default function ProfessionalTemplate({ subject, sections }: Professional
     </Html>
   )
 }
+
+export default ProfessionalTemplate
