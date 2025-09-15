@@ -359,6 +359,7 @@ export default function NewsletterPreview() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+            <h1></h1>
     </div>
   )
 }
