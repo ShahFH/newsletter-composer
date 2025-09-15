@@ -71,28 +71,7 @@ export default function Templates() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-semibold">Spaces</h1>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="secondary">Blog</Badge>
-              <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                Templates
-              </Badge>
-              <Badge variant="secondary">Contact</Badge>
-              <Link href="/dashboard">
-                <Badge variant="outline" className="cursor-pointer hover:bg-gray-100">
-                  Newsletters
-                </Badge>
-              </Link>
-              <div className="w-8 h-8 rounded-full bg-gray-300"></div>
-            </div>
-          </div>
-        </div>
-      </header>
+      
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

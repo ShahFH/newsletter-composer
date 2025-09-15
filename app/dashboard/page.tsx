@@ -133,25 +133,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-semibold">Spaces</h1>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="secondary">Blog</Badge>
-              <Link href="/templates">
-                <Badge variant="secondary" className="cursor-pointer hover:bg-gray-100">
-                  Templates
-                </Badge>
-              </Link>
-              <Badge variant="secondary">Contact</Badge>
-              <div className="w-8 h-8 rounded-full bg-gray-300"></div>
-            </div>
-          </div>
-        </div>
-      </header>
+      
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center space-x-4 mb-6">
@@ -161,7 +143,7 @@ export default function Dashboard() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <h1 className="text-3xl font-bold text-balance">Your Newsletters</h1>
           <Link href="/">
-            <Button className="bg-black text-white hover:bg-gray-800 mt-4 sm:mt-0">Create Newsletter</Button>
+            <Button className="bg-[#171717] text-white hover:bg-gray-800 py-2 px-4">Create Newsletter</Button>
           </Link>
         </div>
 
@@ -186,37 +168,37 @@ export default function Dashboard() {
           ))}
         </div>
 
-        <div className="relative mb-6 max-w-md">
+        <div className="relative mb-6 max-w-md bg-white rounded-[8px]">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search newsletters..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 py-[21px]"
           />
         </div>
 
         <div className="bg-white rounded-lg border">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b bg-gray-50">
+              <thead className="border-b bg-[#F9FAFB]">
                 <tr>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                  <th className="text-left py-3 px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
                     NAME
                   </th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                  <th className="text-left py-3 px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
                     STATUS
                   </th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                  <th className="text-left py-3 px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
                     SUBJECT
                   </th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                  <th className="text-left py-3 px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
                     SENT
                   </th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                  <th className="text-left py-3 px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
                     SCHEDULED
                   </th>
-                  <th className="text-left py-3 px-4 font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                  <th className="text-left py-3 px-4 font-semibold text-[12px] text-muted-foreground uppercase tracking-wide">
                     ACTION
                   </th>
                 </tr>
@@ -234,9 +216,9 @@ export default function Dashboard() {
                 ) : (
                   displayNewsletters.map((newsletter: any) => (
                     <tr key={newsletter.id} className="border-b hover:bg-gray-50">
-                      <td className="py-4 px-4 font-medium">{newsletter.subject || "Untitled"}</td>
+                      <td className="py-4 px-4 font-medium text-[#111827] text-[14px]">{newsletter.subject || "Untitled"}</td>
                       <td className="py-4 px-4">{getStatusBadge(newsletter.status)}</td>
-                      <td className="py-4 px-4 text-muted-foreground max-w-xs">
+                      <td className="py-4 px-4 text-muted-foreground font-normal text-[14px] max-w-xs">
                         {newsletter.sections
                           ?.find((s: any) => s.content)
                           ?.content?.replace(/<[^>]*>/g, "")

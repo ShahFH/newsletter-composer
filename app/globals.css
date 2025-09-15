@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -5,7 +7,7 @@
 
 :root {
   /* Use HSL instead of OKLCH for better compatibility */
-  --background: hsl(0, 0%, 100%);
+  --background: #F9FAFB;
   --foreground: hsl(0, 0%, 3.9%);
   --card: hsl(0, 0%, 100%);
   --card-foreground: hsl(0, 0%, 3.9%);
@@ -120,6 +122,8 @@
     @apply border-border outline-ring;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background: #F9FAFB;
+    font-family: "Inter", sans-serif;
   }
 }

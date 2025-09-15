@@ -109,28 +109,7 @@ export default function NewsletterPreview() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-semibold">Spaces</h1>
-              <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-                <Button variant="ghost" onClick={handleBack} className="flex items-center gap-1 p-0 h-auto">
-                  <ArrowLeft className="h-4 w-4" />
-                  Back
-                </Button>
-                <span className="ml-4">Newsletter Preview</span>
-              </nav>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="secondary">Blog</Badge>
-              <Badge variant="secondary">Templates</Badge>
-              <Badge variant="secondary">Contact</Badge>
-              <div className="w-8 h-8 rounded-full bg-gray-300"></div>
-            </div>
-          </div>
-        </div>
-      </header>
+      
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">

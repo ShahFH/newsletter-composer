@@ -190,35 +190,7 @@ export default function NewsletterComposer() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-semibold">Spaces</h1>
-              <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-                <span>Newsletters</span>
-                <ChevronRight className="h-4 w-4" />
-                <span>New composer</span>
-              </nav>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="secondary">Blog</Badge>
-              <Link href="/templates">
-                <Badge variant="secondary" className="cursor-pointer hover:bg-gray-100">
-                  Templates
-                </Badge>
-              </Link>
-              <Badge variant="secondary">Contact</Badge>
-              <Link href="/dashboard">
-                <Badge variant="outline" className="cursor-pointer hover:bg-gray-100">
-                  Newsletters
-                </Badge>
-              </Link>
-              <div className="w-8 h-8 rounded-full bg-gray-300"></div>
-            </div>
-          </div>
-        </div>
-      </header>
+      
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -244,7 +216,7 @@ export default function NewsletterComposer() {
               <Save className="h-4 w-4 mr-2" />
               Save as Draft
             </Button>
-            <Button size="sm" onClick={handleSend} className="bg-black text-white hover:bg-gray-800">
+            <Button size="sm" onClick={handleSend} className="bg-[#171717] text-white hover:bg-gray-800">
               <Send className="h-4 w-4 mr-2" />
               Send
             </Button>
